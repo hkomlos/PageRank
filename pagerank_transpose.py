@@ -8,7 +8,7 @@ import statistics
 import random
 import datetime
 import json
-
+import time
 
 # get graph set
 def get_graph_set(filename):
@@ -506,7 +506,7 @@ def spam_challenge_prelim():
       json.dump(store_pprs_999, store_pprs_999_file)
 
 # challenge 2 - Spam Resistance
-def spam_post_compute(epsilon):
+def spam_post_compute(epsilon, selected_sites_store):
     spammers_researched_ppr = []
     spammers_another_ppr = []
     spammers_pr = []
@@ -535,7 +535,6 @@ def spam_post_compute(epsilon):
     store_another_ppr_spammers = {num: [] for num in num_trusted_vector}
     store_spammers_ordinal_researched = {num: [] for num in num_trusted_vector}
     store_spammers_ordinal_another = {num: [] for num in num_trusted_vector}
-    store_trusted_selections = {num: [] for num in num_trusted_vector}
     
     epsilon_string = ""
     if epsilon == 0.999:
@@ -556,6 +555,7 @@ def spam_post_compute(epsilon):
             store_pprs[page].append(store_pprs_old[trusted_site][page])
     print("transposed pr vectors")
 
+    start = time.time()
     for num in num_trusted_vector:
         researched_ppr = {}
         another_ppr = {}
@@ -566,14 +566,9 @@ def spam_post_compute(epsilon):
 
         # averaging loop
         for run in range(AVERAGE_RUN_NUM):
-            #randomly choosing trusted sites
-            selected_trusted_sites = random.sample(range(0,TRUSTED_SITES_NUM), num)
-            store_trusted_selections[num].append(selected_trusted_sites)
-            #print(store_trusted_selections[num])
-
             min_pr = {}
             avg_pr = {}
-
+            selected_trusted_sites = selected_sites_store.get(num)[run]
             for page in graph_set:
                 page_pprs = store_pprs[page]
                 min_pr[page] = min([page_pprs[i] for i in selected_trusted_sites])
@@ -610,12 +605,12 @@ def spam_post_compute(epsilon):
                 for key, value in avg_pr.items():
                     another_ppr[key].append(value)
 
-            # hk edits temp storing indiv pprs - needs expanding
             #store_researched_ppr[num].append(researched_ppr)
             #store_avg_ppr[num].append(another_ppr)
             store_researched_ppr_spammers[num].append(calculate_norm_l1(get_spam_ranks(min_pr)))
             store_another_ppr_spammers[num].append(calculate_norm_l1(get_spam_ranks(avg_pr)))
-            #end hk edits
+            end = time.time()
+            print(end - start)
             #for spammer in spammers:
             #    print(spammer ,":", min_pr.get(spammer))
             #for spammer in spammers:
@@ -927,15 +922,20 @@ print(f"MAX_K = {MAX_K}")
 print(f"SAMPLES_NUM = {SAMPLES_NUM}\n")
 
 #sampling the trusted sites
-#print("Sampling the trusted sites...")
+print("Sampling the trusted sites...")
+store_trusted_selections = {num: [] for num in num_trusted_vector}
+for k in num_trusted_vector:
+    for run in range(AVERAGE_RUN_NUM):
+        selected_trusted_sites = random.sample(range(0,TRUSTED_SITES_NUM), k)
+        store_trusted_selections[k].append(selected_trusted_sites)
 
 # plotting the ranks of spammers as function of trusted sites number
 print("Attacking the spam challenge...")
 #spam_challenge_prelim()
-spam_rank_decline = spam_post_compute(0.85)
-spam_rank_decline = spam_post_compute(0.95)
-spam_rank_decline = spam_post_compute(0.99)
-spam_rank_decline = spam_post_compute(0.999)
+spam_rank_decline = spam_post_compute(0.85, store_trusted_selections)
+#spam_rank_decline = spam_post_compute(0.95, store_trusted_selections)
+#spam_rank_decline = spam_post_compute(0.99, store_trusted_selections)
+#spam_rank_decline = spam_post_compute(0.999, store_trusted_selections)
 #spam_rank_decline = spam_challenge()
 #print("\r" + spam_rank_decline)
 print("Done\n")
