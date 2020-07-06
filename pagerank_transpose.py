@@ -506,129 +506,59 @@ def spam_challenge_prelim():
       json.dump(store_pprs_999, store_pprs_999_file)
 
 # challenge 2 - Spam Resistance
-def spam_challenge():
+def spam_post_compute(epsilon):
     spammers_researched_ppr = []
-    spammers_researched_ppr_85 = []
-    spammers_researched_ppr_95 = []
-    spammers_researched_ppr_99 = []
-    spammers_researched_ppr_999 = []
     spammers_another_ppr = []
-    spammers_another_ppr_85 = []
-    spammers_another_ppr_95 = []
-    spammers_another_ppr_99 = []
-    spammers_another_ppr_999 = []
-    #spammers_researched_ppr_with_cost = []
-    #spammers_another_ppr_with_cost = []
-    #theoretical_ppr_with_cost = []
-    spammers_pr_85 = []
-    spammers_pr_95 = []
-    spammers_pr_99 = []
-    spammers_pr_999 = []
+    spammers_pr = []
     iteration_num = 0.0
-    #researched_ppr = {}
-    avg_researched_ppr = {}
-    #another_ppr = {}
-    avg_another_ppr = {}
-    another_ppr_spammers_mean_ordinal_postion_85 = []
-    researched_ppr_spammers_mean_ordinal_postion_85 = []
-    another_ppr_spammers_mean_ordinal_postion_95 = []
-    researched_ppr_spammers_mean_ordinal_postion_95 = []
-    another_ppr_spammers_mean_ordinal_postion_99 = []
-    researched_ppr_spammers_mean_ordinal_postion_99 = []
-    another_ppr_spammers_mean_ordinal_postion_999 = []
-    researched_ppr_spammers_mean_ordinal_postion_999 = []
-    pr_spammers_mean_ordinal_postion_85 = []
-    pr_spammers_mean_ordinal_postion_95 = []
-    pr_spammers_mean_ordinal_postion_99 = []
-    pr_spammers_mean_ordinal_postion_999 = []
+    #avg_researched_ppr = {}
+    #avg_another_ppr = {}
+    another_ppr_spammers_mean_ordinal_postion = []
+    researched_ppr_spammers_mean_ordinal_postion = []
+    pr_spammers_mean_ordinal_postion = []
 
+    print(epsilon)
     # this part creating the spammers sum of regular PR
-    pr_85 = pagerank(G, alpha=0.85, personalization=None, max_iter=100, tol=1.0e-6,
+    pr = pagerank(G, alpha=epsilon, personalization=None, max_iter=100, tol=1.0e-6,
                   nstart=None, weight='weight', dangling=None)
-    pr_95 = pagerank(G, alpha=0.95, personalization=None, max_iter=100, tol=1.0e-6,
-                  nstart=pr_85, weight='weight', dangling=None)
-    pr_99 = pagerank(G, alpha=0.99, personalization=None, max_iter=100, tol=1.0e-6,
-                  nstart=pr_95, weight='weight', dangling=None)
-    pr_999 = pagerank(G, alpha=0.999, personalization=None, max_iter=100, tol=1.0e-6,
-                  nstart=pr_99, weight='weight', dangling=None)
-
-    sum_spammers_pr_85 = calculate_norm_l1(get_spam_ranks(pr_85))
-    sum_spammers_pr_95 = calculate_norm_l1(get_spam_ranks(pr_95))
-    sum_spammers_pr_99 = calculate_norm_l1(get_spam_ranks(pr_99))
-    sum_spammers_pr_999 = calculate_norm_l1(get_spam_ranks(pr_999))
+    print("computed regular pr")
+    sum_spammers_pr = calculate_norm_l1(get_spam_ranks(pr))
+    print("spammers rank for regular pr: {}".format(sum_spammers_pr))
 
     # calculating the ordinal position of the spammers in regular PR
-    pr_sorted_85 = [node for node, rank in sorted(pr_85.items(), key=lambda item: item[1])]
-    pr_spammers_ordinal_postions_85 = {node: position for position, node in enumerate(reversed(pr_sorted_85)) if node in spammers}
-    pr_sorted_95 = [node for node, rank in sorted(pr_95.items(), key=lambda item: item[1])]
-    pr_spammers_ordinal_postions_95 = {node: position for position, node in enumerate(reversed(pr_sorted_95)) if node in spammers}
-    pr_sorted_99 = [node for node, rank in sorted(pr_99.items(), key=lambda item: item[1])]
-    pr_spammers_ordinal_postions_99 = {node: position for position, node in enumerate(reversed(pr_sorted_99)) if node in spammers}
-    pr_sorted_999 = [node for node, rank in sorted(pr_999.items(), key=lambda item: item[1])]
-    pr_spammers_ordinal_postions_999 = {node: position for position, node in enumerate(reversed(pr_sorted_999)) if node in spammers}
+    pr_sorted = [node for node, rank in sorted(pr.items(), key=lambda item: item[1])]
+    pr_spammers_ordinal_postions = {node: position for position, node in enumerate(reversed(pr_sorted)) if node in spammers}
 
-   #hk edits 
-    store_researched_ppr_85 = {num: [] for num in num_trusted_vector} #dict.fromkeys(num_trusted_vector, [])
-    store_avg_ppr_85 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_spammers_85 = {num: [] for num in num_trusted_vector}
-    store_another_ppr_spammers_85 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_researched_85 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_another_85 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_95 = {num: [] for num in num_trusted_vector} #dict.fromkeys(num_trusted_vector, [])
-    store_avg_ppr_95 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_spammers_95 = {num: [] for num in num_trusted_vector}
-    store_another_ppr_spammers_95 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_researched_95 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_another_95 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_99 = {num: [] for num in num_trusted_vector} #dict.fromkeys(num_trusted_vector, [])
-    store_avg_ppr_99 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_spammers_99 = {num: [] for num in num_trusted_vector}
-    store_another_ppr_spammers_99 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_researched_99 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_another_99 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_999 = {num: [] for num in num_trusted_vector} #dict.fromkeys(num_trusted_vector, [])
-    store_avg_ppr_999 = {num: [] for num in num_trusted_vector}
-    store_researched_ppr_spammers_999 = {num: [] for num in num_trusted_vector}
-    store_another_ppr_spammers_999 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_researched_999 = {num: [] for num in num_trusted_vector}
-    store_spammers_ordinal_another_999 = {num: [] for num in num_trusted_vector}
+    store_researched_ppr = {num: [] for num in num_trusted_vector} #dict.fromkeys(num_trusted_vector, [])
+    store_avg_ppr = {num: [] for num in num_trusted_vector}
+    store_researched_ppr_spammers = {num: [] for num in num_trusted_vector}
+    store_another_ppr_spammers = {num: [] for num in num_trusted_vector}
+    store_spammers_ordinal_researched = {num: [] for num in num_trusted_vector}
+    store_spammers_ordinal_another = {num: [] for num in num_trusted_vector}
     store_trusted_selections = {num: [] for num in num_trusted_vector}
-
+    
+    epsilon_string = ""
+    if epsilon == 0.999:
+        epsilon_string = "999"
+    else:
+        epsilon_string = str(int(epsilon * 100))
+    print("epsilon_string = {}".format(epsilon_string))
     #load the stored pprs and trusted sites
-    with open('trusted_sites_store_1000') as sites_file:
+    with open('trusted_sites_store_500') as sites_file:
         trusted_site_set = json.load(sites_file, object_hook=jsonKeys2int)
-    with open('store_pprs_85_1000') as file_85:
-        store_pprs_85_old = json.load(file_85, object_hook=jsonKeys2int)
-    with open('store_pprs_95_1000') as file_95:
-        store_pprs_95_old = json.load(file_95, object_hook=jsonKeys2int)
-    with open('store_pprs_99_1000') as file_99:
-        store_pprs_99_old = json.load(file_99, object_hook=jsonKeys2int)
-    with open('store_pprs_999_1000') as file_999:
-        store_pprs_999_old = json.load(file_999, object_hook=jsonKeys2int)
+    with open('store_pprs_{}_500'.format(epsilon_string)) as file:
+        store_pprs_old = json.load(file, object_hook=jsonKeys2int)
 
-    store_pprs_85 = { page: [] for page in graph_set }
-    store_pprs_95 = { page: [] for page in graph_set }
-    store_pprs_99 = { page: [] for page in graph_set }
-    store_pprs_999 = { page: [] for page in graph_set }
+    print("loaded files")
+    store_pprs = { page: [] for page in graph_set }
     for trusted_site in trusted_site_set:
         for page in graph_set:
-            store_pprs_85[page].append(store_pprs_85_old[trusted_site][page])
-            store_pprs_95[page].append(store_pprs_95_old[trusted_site][page])
-            store_pprs_99[page].append(store_pprs_99_old[trusted_site][page])
-            store_pprs_999[page].append(store_pprs_999_old[trusted_site][page])
+            store_pprs[page].append(store_pprs_old[trusted_site][page])
+    print("transposed pr vectors")
 
     for num in num_trusted_vector:
-        researched_ppr_85 = {}
-        another_ppr_85 = {}
-        researched_ppr_95 = {}
-        another_ppr_95 = {}
-        researched_ppr_99 = {}
-        another_ppr_99 = {}
-        researched_ppr_999 = {}
-        another_ppr_999 = {}
-        #spammers_rank = {}
-        #min_pr = dict()
-        #end hk edits
+        researched_ppr = {}
+        another_ppr = {}
 
         # printing the progress of the loop
         print_progress(iteration_num, len(num_trusted_vector))
@@ -641,187 +571,82 @@ def spam_challenge():
             store_trusted_selections[num].append(selected_trusted_sites)
             #print(store_trusted_selections[num])
 
-            min_pr_85 = {}
-            avg_pr_85 = {}
-            min_pr_95 = {}
-            avg_pr_95 = {}
-            min_pr_99 = {}
-            avg_pr_99 = {}
-            min_pr_999 = {}
-            avg_pr_999 = {}
+            min_pr = {}
+            avg_pr = {}
 
             for page in graph_set:
-                page_pprs = store_pprs_85[page]
-                min_pr_85[page] = min([page_pprs[i] for i in selected_trusted_sites])
-                avg_pr_85[page] = statistics.mean([page_pprs[i] for i in selected_trusted_sites])
-                page_pprs = store_pprs_95[page]
-                min_pr_95[page] = min([page_pprs[i] for i in selected_trusted_sites])
-                avg_pr_95[page] = statistics.mean([page_pprs[i] for i in selected_trusted_sites])
-                page_pprs = store_pprs_99[page]
-                min_pr_99[page] = min([page_pprs[i] for i in selected_trusted_sites])
-                avg_pr_99[page] = statistics.mean([page_pprs[i] for i in selected_trusted_sites])
-                page_pprs = store_pprs_999[page]
-                min_pr_999[page] = min([page_pprs[i] for i in selected_trusted_sites])
-                avg_pr_999[page] = statistics.mean([page_pprs[i] for i in selected_trusted_sites])
+                page_pprs = store_pprs[page]
+                min_pr[page] = min([page_pprs[i] for i in selected_trusted_sites])
+                avg_pr[page] = statistics.mean([page_pprs[i] for i in selected_trusted_sites])
 
             # normalizing the page rank
-            sum_pr_85 = sum(min_pr_85.values())
-            sum_pr_95 = sum(min_pr_95.values())
-            sum_pr_99 = sum(min_pr_99.values())
-            sum_pr_999 = sum(min_pr_999.values())
+            sum_pr = sum(min_pr.values())
             # saving the normlization factor
             #normlization_factor[num_trusted_vector.index(num)].append(sum_pr)
 
-            for page in min_pr_85:
-                min_pr_85.update({page: (min_pr_85.get(page) / sum_pr_85)})
-                min_pr_95.update({page: (min_pr_95.get(page) / sum_pr_95)})
-                min_pr_99.update({page: (min_pr_99.get(page) / sum_pr_99)})
-                min_pr_999.update({page: (min_pr_999.get(page) / sum_pr_999)})
+            for page in min_pr:
+                min_pr.update({page: (min_pr.get(page) / sum_pr)})
             #sum_avg = sum(avg_pr_99.values())
             #sum_min = sum(min_pr_99.values())
             #print(sum_avg)
             #print(sum_min)
 
             #try rank before average
-            researched_sorted_85 = [node for node, rank in sorted(min_pr_85.items(), key=lambda item: item[1])]
-            researched_spammers_ordinal_positions_85 = {node: position for position, node in enumerate(reversed(researched_sorted_85)) if node in spammers}
-            store_spammers_ordinal_researched_85[num].append(statistics.mean(researched_spammers_ordinal_positions_85.values()))
-            another_sorted_85 = [node for node, rank in sorted(avg_pr_85.items(), key=lambda item: item[1])]
-            another_spammers_ordinal_positions_85 = {node: position for position, node in enumerate(reversed(another_sorted_85)) if node in spammers}
-            store_spammers_ordinal_another_85[num].append(statistics.mean(another_spammers_ordinal_positions_85.values()))
+            researched_sorted = [node for node, rank in sorted(min_pr.items(), key=lambda item: item[1])]
+            researched_spammers_ordinal_positions = {node: position for position, node in enumerate(reversed(researched_sorted)) if node in spammers}
+            store_spammers_ordinal_researched[num].append(statistics.mean(researched_spammers_ordinal_positions.values()))
+            another_sorted = [node for node, rank in sorted(avg_pr.items(), key=lambda item: item[1])]
+            another_spammers_ordinal_positions = {node: position for position, node in enumerate(reversed(another_sorted)) if node in spammers}
+            store_spammers_ordinal_another[num].append(statistics.mean(another_spammers_ordinal_positions.values()))
 
-            researched_sorted_95 = [node for node, rank in sorted(min_pr_95.items(), key=lambda item: item[1])]
-            researched_spammers_ordinal_positions_95 = {node: position for position, node in enumerate(reversed(researched_sorted_95)) if node in spammers}
-            store_spammers_ordinal_researched_95[num].append(statistics.mean(researched_spammers_ordinal_positions_95.values()))
-            another_sorted_95 = [node for node, rank in sorted(avg_pr_95.items(), key=lambda item: item[1])]
-            another_spammers_ordinal_positions_95 = {node: position for position, node in enumerate(reversed(another_sorted_95)) if node in spammers}
-            store_spammers_ordinal_another_95[num].append(statistics.mean(another_spammers_ordinal_positions_95.values()))
-
-            researched_sorted_99 = [node for node, rank in sorted(min_pr_99.items(), key=lambda item: item[1])]
-            researched_spammers_ordinal_positions_99 = {node: position for position, node in enumerate(reversed(researched_sorted_99)) if node in spammers}
-            store_spammers_ordinal_researched_99[num].append(statistics.mean(researched_spammers_ordinal_positions_99.values()))
-            another_sorted_99 = [node for node, rank in sorted(avg_pr_99.items(), key=lambda item: item[1])]
-            another_spammers_ordinal_positions_99 = {node: position for position, node in enumerate(reversed(another_sorted_99)) if node in spammers}
-            store_spammers_ordinal_another_99[num].append(statistics.mean(another_spammers_ordinal_positions_99.values()))
-
-            researched_sorted_999 = [node for node, rank in sorted(min_pr_999.items(), key=lambda item: item[1])]
-            researched_spammers_ordinal_positions_999 = {node: position for position, node in enumerate(reversed(researched_sorted_999)) if node in spammers}
-            store_spammers_ordinal_researched_999[num].append(statistics.mean(researched_spammers_ordinal_positions_999.values()))
-            another_sorted_999 = [node for node, rank in sorted(avg_pr_999.items(), key=lambda item: item[1])]
-            another_spammers_ordinal_positions_999 = {node: position for position, node in enumerate(reversed(another_sorted_999)) if node in spammers}
-            store_spammers_ordinal_another_999[num].append(statistics.mean(another_spammers_ordinal_positions_999.values()))
-
-            if not researched_ppr_85:
-                for key, value in min_pr_85.items():
-                    researched_ppr_85[key] = [value]
-                for key, value in min_pr_95.items():
-                    researched_ppr_95[key] = [value]
-                for key, value in min_pr_99.items():
-                    researched_ppr_99[key] = [value]
-                for key, value in min_pr_999.items():
-                    researched_ppr_999[key] = [value]
-                for key, value in avg_pr_85.items():
-                    another_ppr_85[key] = [value]
-                for key, value in avg_pr_95.items():
-                    another_ppr_95[key] = [value]
-                for key, value in avg_pr_99.items():
-                    another_ppr_99[key] = [value]
-                for key, value in avg_pr_999.items():
-                    another_ppr_999[key] = [value]
+            if not researched_ppr:
+                for key, value in min_pr.items():
+                    researched_ppr[key] = [value]
+                for key, value in avg_pr.items():
+                    another_ppr[key] = [value]
             else:
-                for key, value in min_pr_85.items():
-                    researched_ppr_85[key].append(value)
-                for key, value in min_pr_95.items():
-                    researched_ppr_95[key].append(value)
-                for key, value in min_pr_99.items():
-                    researched_ppr_99[key].append(value)
-                for key, value in min_pr_999.items():
-                    researched_ppr_999[key].append(value)
-                for key, value in avg_pr_85.items():
-                    another_ppr_85[key].append(value)
-                for key, value in avg_pr_95.items():
-                    another_ppr_95[key].append(value)
-                for key, value in avg_pr_99.items():
-                    another_ppr_99[key].append(value)
-                for key, value in avg_pr_999.items():
-                    another_ppr_999[key].append(value)
+                for key, value in min_pr.items():
+                    researched_ppr[key].append(value)
+                for key, value in avg_pr.items():
+                    another_ppr[key].append(value)
 
             # hk edits temp storing indiv pprs - needs expanding
             #store_researched_ppr[num].append(researched_ppr)
             #store_avg_ppr[num].append(another_ppr)
-            store_researched_ppr_spammers_85[num].append(calculate_norm_l1(get_spam_ranks(min_pr_85)))
-            store_another_ppr_spammers_85[num].append(calculate_norm_l1(get_spam_ranks(avg_pr_85)))
-            store_researched_ppr_spammers_95[num].append(calculate_norm_l1(get_spam_ranks(min_pr_95)))
-            store_another_ppr_spammers_95[num].append(calculate_norm_l1(get_spam_ranks(avg_pr_95)))
-            store_researched_ppr_spammers_99[num].append(calculate_norm_l1(get_spam_ranks(min_pr_99)))
-            store_another_ppr_spammers_99[num].append(calculate_norm_l1(get_spam_ranks(avg_pr_99)))
-            store_researched_ppr_spammers_999[num].append(calculate_norm_l1(get_spam_ranks(min_pr_999)))
-            store_another_ppr_spammers_999[num].append(calculate_norm_l1(get_spam_ranks(avg_pr_999)))
+            store_researched_ppr_spammers[num].append(calculate_norm_l1(get_spam_ranks(min_pr)))
+            store_another_ppr_spammers[num].append(calculate_norm_l1(get_spam_ranks(avg_pr)))
             #end hk edits
             #for spammer in spammers:
             #    print(spammer ,":", min_pr.get(spammer))
             #for spammer in spammers:
             #    print(spammer ,":", avg_pr.get(spammer))
 
-        for key, value in researched_ppr_85.items():
-            avg_researched_ppr[key] = statistics.mean(value)
-        for key, value in another_ppr_85.items():
-            avg_another_ppr[key] = statistics.mean(value)
+        #for key, value in researched_ppr.items():
+        #    avg_researched_ppr[key] = statistics.mean(value)
+        #for key, value in another_ppr.items():
+        #    avg_another_ppr[key] = statistics.mean(value)
 
         #hk edits
-        researched_ppr_spammers_mean_ordinal_postion_85.append(statistics.mean(store_spammers_ordinal_researched_85[num]))
-        another_ppr_spammers_mean_ordinal_postion_85.append(statistics.mean(store_spammers_ordinal_another_85[num]))
-        researched_ppr_spammers_mean_ordinal_postion_95.append(statistics.mean(store_spammers_ordinal_researched_95[num]))
-        another_ppr_spammers_mean_ordinal_postion_95.append(statistics.mean(store_spammers_ordinal_another_95[num]))
-        researched_ppr_spammers_mean_ordinal_postion_99.append(statistics.mean(store_spammers_ordinal_researched_99[num]))
-        another_ppr_spammers_mean_ordinal_postion_99.append(statistics.mean(store_spammers_ordinal_another_99[num]))
-        researched_ppr_spammers_mean_ordinal_postion_999.append(statistics.mean(store_spammers_ordinal_researched_999[num]))
-        another_ppr_spammers_mean_ordinal_postion_999.append(statistics.mean(store_spammers_ordinal_another_999[num]))
-
-        # calculating the ordinal position of the spammers in K-centers rank
-        #another_ppr_sorted = [node for node, rank in sorted(avg_another_ppr.items(), key=lambda item: item[1])]
-        #another_ppr_spammers_ordinal_postions = {node: position for position, node in enumerate(reversed(another_ppr_sorted)) if node in spammers}
-        #another_ppr_spammers_mean_ordinal_postion.append(round(statistics.mean(another_ppr_spammers_ordinal_postions.values())))
-
-        ## calculating the ordinal position of the spammers in K-min rank
-        #researched_ppr_sorted = [node for node, rank in sorted(avg_researched_ppr.items(), key=lambda item: item[1])]
-        #researched_ppr_spammers_ordinal_postions = {node: position for position, node in enumerate(reversed(researched_ppr_sorted)) if node in spammers}
-        #researched_ppr_spammers_mean_ordinal_postion.append(round(statistics.mean(researched_ppr_spammers_ordinal_postions.values())))
-
-        ## adding the article formula for spam resistance - with cost
-        #spammers_another_ppr_with_cost.append(cost_calculation(avg_another_ppr) / sum(get_spam_ranks(avg_another_ppr).values()))
-        #spammers_researched_ppr_with_cost.append(cost_calculation(avg_another_ppr) / sum(get_spam_ranks(avg_researched_ppr).values()))
-        ## calculating the theoretical Cost(spammers) / Rank(spammers)
-        #theoretical_ppr_with_cost.append(EPSILON / (3 * num))
+        researched_ppr_spammers_mean_ordinal_postion.append(statistics.mean(store_spammers_ordinal_researched[num]))
+        another_ppr_spammers_mean_ordinal_postion.append(statistics.mean(store_spammers_ordinal_another[num]))
 
         # adding the sum of spammers rank to list
-        spammers_another_ppr.append(calculate_norm_l1(get_spam_ranks(avg_another_ppr)))
-        spammers_researched_ppr.append(calculate_norm_l1(get_spam_ranks(avg_researched_ppr)))
+        #spammers_another_ppr.append(calculate_norm_l1(get_spam_ranks(avg_another_ppr)))
+        #spammers_researched_ppr.append(calculate_norm_l1(get_spam_ranks(avg_researched_ppr)))
 
-        spammers_researched_ppr_85.append(statistics.mean(store_researched_ppr_spammers_85[num]))
-        spammers_another_ppr_85.append(statistics.mean(store_another_ppr_spammers_85[num]))
-        spammers_researched_ppr_95.append(statistics.mean(store_researched_ppr_spammers_95[num]))
-        spammers_another_ppr_95.append(statistics.mean(store_another_ppr_spammers_95[num]))
-        spammers_researched_ppr_99.append(statistics.mean(store_researched_ppr_spammers_99[num]))
-        spammers_another_ppr_99.append(statistics.mean(store_another_ppr_spammers_99[num]))
-        spammers_researched_ppr_999.append(statistics.mean(store_researched_ppr_spammers_999[num]))
-        spammers_another_ppr_999.append(statistics.mean(store_another_ppr_spammers_999[num]))
+        spammers_researched_ppr.append(statistics.mean(store_researched_ppr_spammers[num]))
+        spammers_another_ppr.append(statistics.mean(store_another_ppr_spammers[num]))
 
         # appending regualr PR vectors
-        pr_spammers_mean_ordinal_postion_85.append(statistics.mean(pr_spammers_ordinal_postions_85.values()))
-        spammers_pr_85.append(sum_spammers_pr_85)
-        pr_spammers_mean_ordinal_postion_95.append(statistics.mean(pr_spammers_ordinal_postions_95.values()))
-        spammers_pr_95.append(sum_spammers_pr_95)
-        pr_spammers_mean_ordinal_postion_99.append(statistics.mean(pr_spammers_ordinal_postions_99.values()))
-        spammers_pr_99.append(sum_spammers_pr_99)
-        pr_spammers_mean_ordinal_postion_999.append(statistics.mean(pr_spammers_ordinal_postions_999.values()))
-        spammers_pr_999.append(sum_spammers_pr_999)
-
+        pr_spammers_mean_ordinal_postion.append(statistics.mean(pr_spammers_ordinal_postions.values()))
+        spammers_pr.append(sum_spammers_pr)
+    
+    print("\ncomputed ranks")
     # calculate the mean of the normlization vector of each k
     #mean_normlization_factor = [statistics.mean(k_values_list) for k_values_list in normlization_factor]
 
     # saving the results in file
-    with open('spam_res_7-4', 'w') as spam_res_file:
+    with open('spam_res_7-5_{}'.format(epsilon_string), 'w') as spam_res_file:
       # Test parameters
       spam_res_file.write('Test Results parameters:\n')
       spam_res_file.write("Number of samples = %s\n" % SAMPLES_NUM)
@@ -836,53 +661,20 @@ def spam_challenge():
       #
       # saving K-min sum of spammers
       spam_res_file.write('\n')
-      spam_res_file.write('\nK-min ')
+      spam_res_file.write('\nK-min_{}\n'.format(epsilon_string))
       for item in spammers_researched_ppr:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_85 ')
-      for item in spammers_researched_ppr_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_95 ')
-      for item in spammers_researched_ppr_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_99 ')
-      for item in spammers_researched_ppr_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_999 ')
-      for item in spammers_researched_ppr_999:
         spam_res_file.write("%s " % item)
         #
       # saving K-centers sum of spammers
       spam_res_file.write('\n')
-      spam_res_file.write('\nK-centers ')
+      spam_res_file.write('\nK-centers_{}\n'.format(epsilon_string))
       for item in spammers_another_ppr:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers_85 ')
-      for item in spammers_another_ppr_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers_95 ')
-      for item in spammers_another_ppr_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers_99 ')
-      for item in spammers_another_ppr_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers_999 ')
-      for item in spammers_another_ppr_999:
         spam_res_file.write("%s " % item)
         #
       # saving regular pr sum of spammers
       spam_res_file.write('\n')
-      spam_res_file.write('\nregular_pr_85 ')
-      for item in spammers_pr_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular_pr_95 ')
-      for item in spammers_pr_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular_pr_99 ')
-      for item in spammers_pr_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular_pr_999 ')
-      for item in spammers_pr_999:
+      spam_res_file.write('\nregular_pr_{}\n'.format(epsilon_string))
+      for item in spammers_pr:
         spam_res_file.write("%s " % item)
         #
       # saving the normalization vector
@@ -893,156 +685,75 @@ def spam_challenge():
         #
       # saving the ordinal postions vectors
       spam_res_file.write('\n')
-      spam_res_file.write('\nK-min_85_spammers_mean_ordinal_postions ')
-      for item in researched_ppr_spammers_mean_ordinal_postion_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_95_spammers_mean_ordinal_postions ')
-      for item in researched_ppr_spammers_mean_ordinal_postion_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_99_spammers_mean_ordinal_postions ')
-      for item in researched_ppr_spammers_mean_ordinal_postion_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-min_999_spammers_mean_ordinal_postions ')
-      for item in researched_ppr_spammers_mean_ordinal_postion_999:
+      spam_res_file.write('\nK-min_spammers_mean_ordinal_postions_{}\n'.format(epsilon_string))
+      for item in researched_ppr_spammers_mean_ordinal_postion:
         spam_res_file.write("%s " % item)
         #
       spam_res_file.write('\n')
-      spam_res_file.write('\nK-centers-85-spammers-mean-ordinal-postions ')
-      for item in another_ppr_spammers_mean_ordinal_postion_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers-95-spammers-mean-ordinal-postions ')
-      for item in another_ppr_spammers_mean_ordinal_postion_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers-99-spammers-mean-ordinal-postions ')
-      for item in another_ppr_spammers_mean_ordinal_postion_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nK-centers-999-spammers-mean-ordinal-postions ')
-      for item in another_ppr_spammers_mean_ordinal_postion_999:
+      spam_res_file.write('\nK-centers-85-spammers-mean-ordinal-postions_{}\n'.format(epsilon_string))
+      for item in another_ppr_spammers_mean_ordinal_postion:
         spam_res_file.write("%s " % item)
       # 
       spam_res_file.write('\n')
-      spam_res_file.write('\nregular-PR-85-spammers mean-ordinal-postions ')
-      for item in pr_spammers_mean_ordinal_postion_85:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular-PR-95-spammers mean-ordinal-postions ')
-      for item in pr_spammers_mean_ordinal_postion_95:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular-PR-99-spammers mean-ordinal-postions ')
-      for item in pr_spammers_mean_ordinal_postion_99:
-        spam_res_file.write("%s " % item)
-      spam_res_file.write('\nregular-PR-999-spammers mean-ordinal-postions ')
-      for item in pr_spammers_mean_ordinal_postion_999:
+      spam_res_file.write('\nregular-PR-85-spammers mean-ordinal-postions_{}\n'.format(epsilon_string))
+      for item in pr_spammers_mean_ordinal_postion:
         spam_res_file.write("%s " % item)
      #
      # saving the individual runs for spam ranks
       spam_res_file.write('\n')
       spam_res_file.write('\n')
-      spam_res_file.write('K-min 85 spammer ranks each run\n')
-      for key, value in store_researched_ppr_spammers_85.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 95 spammer ranks each run\n')
-      for key, value in store_researched_ppr_spammers_95.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 99 spammer ranks each run\n')
-      for key, value in store_researched_ppr_spammers_99.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 999 spammer ranks each run\n')
-      for key, value in store_researched_ppr_spammers_999.items():
+      spam_res_file.write('K-min_spammer_ranks_each_run_{}\n'.format(epsilon_string))
+      for key, value in store_researched_ppr_spammers.items():
         spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
       #
       spam_res_file.write('\n')
-      spam_res_file.write('K-centers 85 spammer ranks each run\n')
-      for key,value in store_another_ppr_spammers_85.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 95 spammer ranks each run\n')
-      for key, value in store_another_ppr_spammers_95.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 99 spammer ranks each run\n')
-      for key, value in store_another_ppr_spammers_99.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 999 spammer ranks each run\n')
-      for key, value in store_another_ppr_spammers_999.items():
+      spam_res_file.write('K-centers_spammer_ranks_each_run_{}\n'.format(epsilon_string))
+      for key,value in store_another_ppr_spammers.items():
         spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
       #
       # saving the individual runs for spam ordinals
       spam_res_file.write('\n')
-      spam_res_file.write('K-min 85 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_researched_85.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 95 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_researched_95.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 99 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_researched_99.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-min 999 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_researched_999.items():
+      spam_res_file.write('K-min_spammer_ordinals_each_run_{}\n'.format(epsilon_string))
+      for key, value in store_spammers_ordinal_researched.items():
         spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
       #
       spam_res_file.write('\n')
-      spam_res_file.write('K-centers 85 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_another_85.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 95 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_another_95.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 99 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_another_99.items():
-        spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
-      spam_res_file.write('K-centers 999 spammer ranks each run\n')
-      for key, value in store_spammers_ordinal_another_999.items():
+      spam_res_file.write('K-centers_spammer_ordinals_each_run_{}\n'.format(epsilon_string))
+      for key, value in store_spammers_ordinal_another.items():
         spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
         #
-      spam_res_file.write('trusted site selections\n')
+      spam_res_file.write('\ntrusted site selections\n')
       for key, value in store_trusted_selections.items():
-          spam_res_rile.write("%s: %s\n" % (key, ' '.join(map(str,value))))
+          spam_res_file.write("%s: %s\n" % (key, ' '.join(map(str,value))))
+    print("wrote to spam_res file")
 
 
     #plotting ordinal positions vectors
     plt.figure(figsize=(7.7, 5.3))
-    plt.plot(num_trusted_vector, researched_ppr_spammers_mean_ordinal_postion_85, 'b', label="k-min with epsilon=0.15")
-    plt.plot(num_trusted_vector, another_ppr_spammers_mean_ordinal_postion_85, 'g', label="k-centers with epsilon=0.15")
-    plt.plot(num_trusted_vector, pr_spammers_mean_ordinal_postion_85, 'r', label="PR")
+    plt.plot(num_trusted_vector, researched_ppr_spammers_mean_ordinal_postion, 'b', label="k-min with epsilon={}".format(round(1-epsilon,3)))
+    plt.plot(num_trusted_vector, another_ppr_spammers_mean_ordinal_postion, 'g', label="k-centers with epsilon=0{}".format(round(1-epsilon,3)))
+    plt.plot(num_trusted_vector, pr_spammers_mean_ordinal_postion, 'r', label="PR")
     plt.legend(loc="upper right")
     plt.xlabel("Number Of Trusted Sites")
     plt.ylabel("Spammers mean ordinal position")
     plt.title("Spammers mean ordinal position Vs Trusted sites number")
-    plt.savefig("Spammers mean ordinal position Vs Trusted sites number 7-4.png") #+ datetime.now() + ".png")
-
-    plt.figure(figsize=(7.7, 5.3))
-    plt.plot(num_trusted_vector, researched_ppr_spammers_mean_ordinal_postion_999, 'b', label="k-min with epsilon=0.001")
-    plt.plot(num_trusted_vector, another_ppr_spammers_mean_ordinal_postion_999, 'g', label="k-centers with epsilon=0.001")
-    plt.plot(num_trusted_vector, pr_spammers_mean_ordinal_postion_999, 'r', label="PR")
-    plt.legend(loc="upper right")
-    plt.xlabel("Number Of Trusted Sites")
-    plt.ylabel("Spammers mean ordinal position")
-    plt.title("Spammers mean ordinal position Vs Trusted sites number")
-    plt.savefig("Spammers mean ordinal position Vs Trusted sites number 7-4.png") 
+    plt.savefig("Spammers mean ordinal position Vs Trusted sites number 7-5 {}.png".format(epsilon_string))
 
     #plotting the sum of spammers vectors
     plt.figure(figsize=(7.7, 5.3))
-    plt.plot(num_trusted_vector, spammers_researched_ppr_85, 'b', label="k-min with epsilon=0.15")
-    plt.plot(num_trusted_vector, spammers_another_ppr_85, 'g', label="k-centers with epsilon=0.15")
-    plt.plot(num_trusted_vector, spammers_pr_85, 'r', label="PR")
+    plt.plot(num_trusted_vector, spammers_researched_ppr, 'b', label="k-min with epsilon={}".format(round(1-epsilon,3)))
+    plt.plot(num_trusted_vector, spammers_another_ppr, 'g', label="k-centers with epsilon={}".format(round(1-epsilon,3)))
+    plt.plot(num_trusted_vector, spammers_pr, 'r', label="PR")
     plt.legend(loc="upper right")
     plt.xlabel("Number Of Trusted Sites")
     plt.ylabel("Sum of Spam sites rank")
     plt.title("Sum of Spam sites rank Vs Trusted sites number")
-    plt.savefig("Sum of Spam sites rank Vs Trusted sites number 7-4.png")
+    plt.savefig("Sum of Spam sites rank Vs Trusted sites number 7-5 {}.png".format(epsilon_string))
     #text_tp_print = "The spam sites rank declined in " + str(abs(100 * ((spammers_researched_ppr[len(num_trusted_vector) - 1] -
     #                                                                     spammers_pr[0]) / spammers_pr[0]))) + "%"
     # printing the normalization vector
     #print(f"\nK-min normlization vector:\n{mean_normlization_factor}\n")
     #return text_tp_print
-    plt.figure(figsize=(7.7, 5.3))
-    plt.plot(num_trusted_vector, spammers_researched_ppr_999, 'b', label="k-min with epsilon=0.001")
-    plt.plot(num_trusted_vector, spammers_another_ppr_999, 'g', label="k-centers with epsilon=0.001")
-    plt.plot(num_trusted_vector, spammers_pr_999, 'r', label="PR")
-    plt.legend(loc="upper right")
-    plt.xlabel("Number Of Trusted Sites")
-    plt.ylabel("Sum of Spam sites rank")
-    plt.title("Sum of Spam sites rank Vs Trusted sites number")
-    plt.savefig("Sum of Spam sites rank Vs Trusted sites number 7-4.png") 
 
 
 # challenge 3 - Distortion
@@ -1221,7 +932,11 @@ print(f"SAMPLES_NUM = {SAMPLES_NUM}\n")
 # plotting the ranks of spammers as function of trusted sites number
 print("Attacking the spam challenge...")
 #spam_challenge_prelim()
-spam_rank_decline = spam_challenge()
+spam_rank_decline = spam_post_compute(0.85)
+spam_rank_decline = spam_post_compute(0.95)
+spam_rank_decline = spam_post_compute(0.99)
+spam_rank_decline = spam_post_compute(0.999)
+#spam_rank_decline = spam_challenge()
 #print("\r" + spam_rank_decline)
 print("Done\n")
 
